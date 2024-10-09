@@ -1,0 +1,77 @@
+body{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #7ec0f9;
+}
+.container {
+    width: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: space-around; 
+    margin: 20px;
+}
+.game-board {
+    display: grid;
+    grid-template-columns: repeat(12, 50px); 
+    grid-template-rows: repeat(10, 50px); 
+    border: 6px solid  #009dff; 
+
+}
+.cell {
+    border: 1px solid  rgb(250, 246, 246);
+    background-color:rgb(223, 188, 255)
+}
+.cell:nth-child(-n+12), /* השורה הראשונה */
+.cell:nth-last-child(-n+12), /* השורה האחרונה */
+.cell:nth-child(12n + 1), /* הטור הראשון */
+.cell:nth-child(12n) { /* הטור האחרון */
+    background-color: rgb(183, 106, 254); 
+}
+.ball {
+    font-size: 33px; 
+}
+.score-board {
+    margin-left: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: #fff;
+    border: 2px solid #009dff;
+    padding: 20px;
+    border-radius: 10px;
+    font-size: 50px;
+    color: #009dff;
+}
+
+.score {
+    margin-top: 10px;
+    font-size: 40px;
+    font-weight: bold;
+}
+.divider {
+    width: 100%; 
+    height: 2px; 
+    background-color: #009dff;
+    border: none;
+    margin: 10px 0; 
+}
+.player {
+    font-size: 40px; 
+}
+.game-instructions {
+    width: 200px;
+    color: #fbfbfb; 
+}
+
+.game-title {
+    font-size: 46px; 
+    font-weight: bold; 
+    margin: 0; 
+}
+
+.instructions {
+    font-size: 20px; 
+    margin-top: 5px; 
+}
