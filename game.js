@@ -5,14 +5,25 @@ const occupiedCells = new Set();
 const cells = [];
 let counter = 0
 
+const excludedCells = [24, 107, 109, 10]; // תאים שאותם נרצה לדלג
+
 // יצירת התאים
 for (let i = 0; i < totalCells; i++) {
-    // if(i!=24||i!=)
-    const cell = document.createElement('div');
-    cell.classList.add('cell');
-    board.appendChild(cell);
-    cells.push(cell); // שמירה במערך לצורך גישה נוחה לכל התאים
+    // אם המספר קיים במערך של התאים שאינם מותרים, דלג עליו
+    if (!excludedCells.includes(i)) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        board.appendChild(cell);
+        cells.push(cell); // שמירה במערך לצורך גישה נוחה לכל התאים
+    } else {
+        // להוסיף תא ריק עבור התאים שיש לדלג עליהם כדי לשמור על המבנה
+        const cell = document.createElement('div');
+        // cell.classList.add('cell', 'excluded'); // קלאס מיוחד לתא ריק
+        board.appendChild(cell);
+        cells.push(cell);
+    }
 }
+
 
 // מיקום התחלתי של השחקן במרכז הלוח 
 let playerPosition = 65;
@@ -46,25 +57,46 @@ ballInterval = setInterval(addBall, 500);
 // פונקציה להזזת השחקן
 function movePlayer(newPosition) {
 
+    // מעבר בין תא 25 לתא 106
+    if (playerPosition === 25 && newPosition === 24) {
+        newPosition = 106; // מעבר שמאלה מתא 25 לתא 106
+    } else if (playerPosition === 106 && newPosition === 107) {
+        newPosition = 25; // מעבר ימינה מתא 106 לתא 25
+    }
+
+    // מעבר בין תא 22 לתא 97
+    if (playerPosition === 22 && newPosition === 10) {
+        newPosition = 97; // מעבר למעלה מתא 22 לתא 97
+    } else if (playerPosition === 97 && newPosition === 109) {
+        newPosition = 22; // מעבר למטה מתא 97 לתא 22
+    }
+
+    // בדיקה אם המיקום החדש הוא תא חיצוני
+    if (isOuterCell(newPosition)) {
+        return; // מונע מעבר לתא חיצוני
+    }
+
+    // בדיקה אם השחקן אוסף כדור
     if (cells[newPosition].innerHTML.includes('⚽')) {
         counter++;
         score.textContent = counter;
     }
-    cells[playerPosition].innerHTML = '';
-    playerPosition = newPosition;
-    cells[playerPosition].innerHTML = '<span class="player">😀</span>';
+
+    // עדכון התא הנוכחי והתא החדש
+    cells[playerPosition].innerHTML = ''; // תא קודם מתנקה
+    playerPosition = newPosition; // עדכון מיקום השחקן
+    cells[playerPosition].innerHTML = '<span class="player">😀</span>'; // תא חדש מקבל את השחקן
+
+    // בדיקת ניצחון כאשר כל הכדורים נאספו
     if (counter === 80) {
-        cells[playerPosition].innerHTML = '<span class="player">🥳</span>'; 
-    
+        cells[playerPosition].innerHTML = '<span class="player">🥳</span>';
         setTimeout(() => {
             if (confirm("Congratulations! You've caught all the balls! Would you like to restart the game?")) {
                 restartGame();
             }
         }, 0); 
     }
-    
 }
-
 
 // מאזינים לאירועים של לחיצה על מקשים
 document.addEventListener('keydown', function (event) {
@@ -73,26 +105,22 @@ document.addEventListener('keydown', function (event) {
 
     switch (event.key) {
         case 'ArrowUp':
-            if (newPosition - columns >= 0 && !isOuterCell(newPosition - columns)) {
-                // מוודא שהשחקן לא עובר את הגבול העליון ולא זז לתא חיצוני
+            if (newPosition - columns >= 0) {
                 newPosition -= columns;
             }
             break;
         case 'ArrowDown':
-            if (newPosition + columns < totalCells && !isOuterCell(newPosition + columns)) {
-                // מוודא שהשחקן לא עובר את הגבול התחתון ולא זז לתא חיצוני
+            if (newPosition + columns < totalCells) {
                 newPosition += columns;
             }
             break;
         case 'ArrowLeft':
-            if (newPosition % columns !== 0 && !isOuterCell(newPosition - 1)) {
-                // מוודא שהשחקן לא עובר את הגבול השמאלי ולא זז לתא חיצוני
+            if (newPosition % columns !== 0) {
                 newPosition -= 1;
             }
             break;
         case 'ArrowRight':
-            if (newPosition % columns !== columns - 1 && !isOuterCell(newPosition + 1)) {
-                // מוודא שהשחקן לא עובר את הגבול הימני ולא זז לתא חיצוני
+            if (newPosition % columns !== columns - 1) {
                 newPosition += 1;
             }
             break;
@@ -100,6 +128,7 @@ document.addEventListener('keydown', function (event) {
 
     movePlayer(newPosition); // מעדכן את מיקום השחקן
 });
+
 
 function restartGame() {
     // איפוס המונה
